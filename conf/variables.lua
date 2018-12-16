@@ -15,9 +15,14 @@ emacsclient = "emacsclient -nc --socket-name /tmp/emacs1000/server"
 theme = "default"
 --wallpaper = "/home/yash/.bing-wallpapers/space.jpg"
 -- wallpaper = "/home/yash/.bing-wallpapers/wallhaven-684422.png"
-local handle = io.popen("/home/yash/.config/awesome/walls.sh")
-wallpaper = handle:read("*a")
-handle:close()
+function wallpaper(s)
+  -- Wallpaper
+  local handle = io.popen("/home/yash/.config/awesome/walls.sh")
+  local w = handle:read("*a")
+  handle:close()
+  return w
+end
+
 font = "Source Code Pro Semibold 13"
 
 -- Default modkey.
