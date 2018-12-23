@@ -28,7 +28,7 @@ awful.screen.connect_for_each_screen(
       awful.tag.add(
         1,
         {
-          icon = iconPath .. 'firefox-logo.svg',
+          icon = iconPath .. 'firefox.png',
           icon_only = true,
           layout = awful.layout.layouts[1],
           gap_single_client = false,
@@ -40,16 +40,31 @@ awful.screen.connect_for_each_screen(
       awful.tag.add(
         2,
         {
+          icon = iconPath .. 'spacemacs.svg',
+          icon_only = true,
           layout = awful.layout.layouts[1],
           gap_single_client = false,
           gap = 4,
           screen = s,
         }
       )
-      for i = 3, 10, 1 do
+      awful.tag.add(
+        3,
+        {
+          icon = iconPath .. 'terminal.svg',
+          icon_only = true,
+          layout = awful.layout.layouts[1],
+          gap_single_client = false,
+          gap = 4,
+          screen = s,
+        }
+      )
+      for i = 4, 10, 1 do
         awful.tag.add(
           i,
           {
+            icon = iconPath .. 'project-' .. i .. '.svg',
+            icon_only = true,
             layout = awful.layout.layouts[1],
             gap_single_client = false,
             gap = 4,

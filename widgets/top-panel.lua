@@ -2,32 +2,50 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local wibox = require('wibox')
 local gears = require('gears')
+local iconPath = os.getenv('HOME') .. '/.config/awesome/icons/'
 
+local TaskList = require("widgets.task-list")
 local widget_battery = require("widgets.battery")
 local widget_brightness = require("widgets.brightness")
 local widget_memory = require("widgets.memory")
 local widget_volume = require("widgets.volume")
 local mytextclock = wibox.widget.textclock()
 
-local TopPanel = function(s)
+local TopPanel = function(s, h)
     local layoutbox = awful.widget.layoutbox(s)
     layoutbox:buttons(gears.table.join(
                           awful.button({ }, 1, function () awful.layout.inc( 1) end),
                           awful.button({ }, 3, function () awful.layout.inc(-1) end),
                           awful.button({ }, 4, function () awful.layout.inc( 1) end),
                           awful.button({ }, 5, function () awful.layout.inc(-1) end)))
+
+    -- Create a tasklist widget
+    local tasklist = TaskList(s)
+
     local panel = awful.wibar(
         {
             position = "top",
             screen = s,
             bg = beautiful.panel_bg,
-            fg = beautiful.fg_normal
+            fg = beautiful.fg_normal,
+            ontop = true,
+            height = h,
         }
     )
+
+    local archIcon = wibox.widget.imagebox()
+    archIcon.image = iconPath .. 'arch.svg',
     -- Add widgets to the wibox
     panel:setup {
         layout = wibox.layout.align.horizontal,
-        nil,
+        {
+            layout = wibox.layout.fixed.horizontal,
+            wibox.container.background(
+                wibox.container.margin(archIcon, 9, 9, 9, 9),
+                beautiful.panel_bg
+            ),
+            tasklist
+        },
         nil,
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,

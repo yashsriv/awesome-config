@@ -20,14 +20,42 @@ end
 screen.connect_signal("property::geometry", set_wallpaper)
 
 local TopPanel = require("widgets.top-panel")
-local BottomPanel = require("widgets.bottom-panel")
+-- local BottomPanel = require("widgets.bottom-panel")
+local LeftPanel = require("widgets.left-panel")
 
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
     -- Create the wibox
-    s.myupperwibox = TopPanel(s)
-    s.mylowerwibox = BottomPanel(s)
+    s.leftPanel = LeftPanel(s, 40)
+    s.topPanel = TopPanel(s, 40)
 end)
 -- }}}
+
+-- Hide bars when app go fullscreen
+function updateBarsVisibility()
+  for s in screen do
+    if s.selected_tag then
+      local fullscreen = s.selected_tag.fullscreenMode
+      -- Order matter here for shadow
+      s.topPanel.visible = not fullscreen
+      s.leftPanel.visible = not fullscreen
+    end
+  end
+end
+
+_G.tag.connect_signal(
+  'property::selected',
+  function(s)
+    updateBarsVisibility()
+  end
+)
+
+_G.client.connect_signal(
+  'property::fullscreen',
+  function(c)
+    c.first_tag.fullscreenMode = c.fullscreen
+    updateBarsVisibility()
+  end
+)

@@ -22,31 +22,32 @@ local taglist_buttons = gears.table.join(
 )
 
 
-local BottomPanel = function(s)
+local LeftPanel = function(s, w)
   -- Create a promptbox for each screen
   local promptbox = awful.widget.prompt()
   -- Create a taglist widget
-  local taglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons, {}, nil, wibox.layout.fixed.horizontal())
-
+  local taglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons, {}, nil, wibox.layout.fixed.vertical())
 
   s.mypromptbox = promptbox
 
   local panel = awful.wibar(
     {
-      position = "bottom",
+      position = "left",
       screen = s,
       bg = beautiful.panel_bg,
-      fg = beautiful.fg_normal
+      fg = beautiful.fg_normal,
+      width = w,
+      ontop = true,
     }
   )
 
   panel:setup {
-    layout = wibox.layout.align.horizontal,
+    layout = wibox.layout.align.vertical,
     taglist,
     promptbox,
-    nil, -- Middle widget
+    nil,
   }
   return panel
 end
 
-return BottomPanel
+return LeftPanel
