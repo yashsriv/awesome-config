@@ -7,7 +7,7 @@ function run {
     fi
 }
 
-run xautolock -detectsleep -time 3 -locker "/home/yash/bin/lock.sh" -notify 30 -notifier "/home/yash/bin/lock-notify.sh"
+run xautolock -detectsleep -corners ---- -cornersize 30 -time 3 -locker "/home/yash/bin/lock.sh" -notify 30 -notifier "/home/yash/bin/lock-notify.sh"
 run xss-lock -- "/home/yash/bin/lock.sh"
 #run emacs --daemon
-run /home/yash/bin/disable-autolock 2>&1 1> /tmp/disable-logs
+#run /home/yash/bin/disable-autolock 2>&1 1> /tmp/disable-logs

@@ -1,50 +1,76 @@
 local beautiful = require("beautiful")
-local gears = require("gears")
+local dpi = beautiful.xresources.apply_dpi
 local naughty = require("naughty")
 local vicious = require("vicious")
 local wibox = require("wibox")
+-- local iconPath = '/usr/share/icons/Adwaita/scalable/status/'
+-- local iconPath = '/usr/share/icons/Arc/status/symbolic/'
+local filesystem = require('gears.filesystem')
+local iconPath = filesystem.get_configuration_dir() .. '/icons/battery/'
 
+local text_bat = wibox.widget {
+  align = 'center',
+  widget = wibox.widget.textbox
+}
 
-progress_bat = wibox.widget.progressbar()
-text_bat = wibox.widget.textbox()
+local battery_icon = wibox.widget {
+  image  = iconPath .. 'battery_unknown.svg',
+  widget = wibox.widget.imagebox
+}
 
 -- Create wibox with batwidget
-batbox = wibox.widget {
-  {
-    max_value     = 1,
-    widget        = progress_bat,
-    forced_height = 20,
-    forced_width  = 100,
-    background_color = gears.color.create_solid_pattern("#222222"),
-  },
-  {
-    widget = text_bat,
-  },
-  layout = wibox.layout.stack
+local batbox = wibox.widget {
+  wibox.container.margin(battery_icon, dpi(5), dpi(5), dpi(5), dpi(5)),
+  text_bat,
+  layout = wibox.layout.fixed.vertical
 }
 -- batbox = wibox.layout.margin(batbox, 1, 1, 3, 3)
 -- Register battery widget
-vicious.register(progress_bat, vicious.widgets.bat,
-                 function (widget, args)
+vicious.register(battery_icon, vicious.widgets.bat,
+                 function (w, args)
+                   local val = tonumber(args[2])
                    if args[1] == "-" then
-                     local val = tonumber(args[2])
-                     if val > 75 then
-                       progress_bat.color = gears.color.create_solid_pattern("#2e7d32")
+                     if val == 100 then
+                       w.image = iconPath .. "battery_full.svg"
+                     elseif val > 90 then
+                       w.image = iconPath .. "battery_90.svg"
+                     elseif val > 80 then
+                       w.image = iconPath .. "battery_80.svg"
+                     elseif val > 60 then
+                       w.image = iconPath .. "battery_60.svg"
                      elseif val > 50 then
-                       progress_bat.color = gears.color.create_solid_pattern("#60ad5e")
-                     elseif val > 25 then
-                       progress_bat.color = gears.color.create_solid_pattern("#f9a825")
+                       w.image = iconPath .. "battery_50.svg"
+                     elseif val > 30 then
+                       w.image = iconPath .. "battery_30.svg"
+                     elseif val > 20 then
+                       w.image = iconPath .. "battery_20.svg"
                      else
-                       progress_bat.color = gears.color.create_solid_pattern("#d32f2f")
+                       w.image = iconPath .. "battery_alert.svg"
                        if val < 15 then
                          naughty.notify({ preset = naughty.config.presets.critical,
-                                          title = "Low Battery",
+                                          icon = iconPath .. 'battery_alert.svg',
+                                          icon_size = 48,
+                                          title = "Houston we have a problem",
                                           text = "Only " .. args[2] .. "% left",
-                                          timeout = 12 })
+                                          timeout = 6 })
                        end
                      end
                    else
-                     progress_bat.color = gears.color.create_solid_pattern("#283593")
+                     if val == 100 then
+                       w.image = iconPath .. "battery_charging_full.svg"
+                     elseif val > 90 then
+                       w.image = iconPath .. "battery_charging_90.svg"
+                     elseif val > 80 then
+                       w.image = iconPath .. "battery_charging_80.svg"
+                     elseif val > 60 then
+                       w.image = iconPath .. "battery_charging_60.svg"
+                     elseif val > 50 then
+                       w.image = iconPath .. "battery_charging_50.svg"
+                     elseif val > 30 then
+                       w.image = iconPath .. "battery_charging_30.svg"
+                     else
+                       w.image = iconPath .. "battery_charging_20.svg"
+                     end
                    end
                    return args[2]
                  end,

@@ -11,8 +11,10 @@ require("awful.hotkeys_popup.keys")
 
 require("module.notifications")
 require("module.auto-start")
+require('module.backdrop')
 require("module.theme")
 require("module.panel")
+require('module.exit-screen')
 
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
