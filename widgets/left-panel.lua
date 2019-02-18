@@ -3,13 +3,17 @@ local beautiful = require('beautiful')
 local dpi = require('beautiful').xresources.apply_dpi
 local wibox = require('wibox')
 local gears = require('gears')
+local naughty = require('naughty')
 local filesystem = require('gears.filesystem')
 local iconPath = filesystem.get_configuration_dir() .. '/icons/'
 
 local variables = require("conf.variables")
-local widget_battery = require("widgets.battery")
 local clickable_container = require("widgets.clickable-container")
 local mat_list_item = require('widgets.mat-list-item')
+
+local widget_battery = require("widgets.battery")
+local systray = wibox.widget.systray()
+systray:set_horizontal(false)
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -35,13 +39,6 @@ local arch_icon = wibox.widget {
 }
 
 local LeftPanel = function(s, w, mw)
-  local layoutbox = awful.widget.layoutbox(s)
-  layoutbox:buttons(gears.table.join(
-                      awful.button({ }, 1, function () awful.layout.inc( 1) end),
-                      awful.button({ }, 3, function () awful.layout.inc(-1) end),
-                      awful.button({ }, 4, function () awful.layout.inc( 1) end),
-                      awful.button({ }, 5, function () awful.layout.inc(-1) end)))
-
   -- Create a taglist widget
   local taglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons, {}, nil,
                                        wibox.layout.fixed.vertical())
@@ -107,6 +104,8 @@ local LeftPanel = function(s, w, mw)
       )
     end
 
+  local exit_screen_grabber = nil
+
   local openPanel = function(should_run_rofi)
     panel.width = mw
     panel.visible = false
@@ -114,6 +113,26 @@ local LeftPanel = function(s, w, mw)
     backdrop.visible = true
     if should_run_rofi then
       run_rofi()
+    else
+      exit_screen_grabber =
+        awful.keygrabber.run(
+          function(_, key, event)
+            if event == 'release' then
+              return
+            end
+
+            if key == 'Escape' or key == 'q' or key == 'x'
+              or key == 'p' then
+              panel:toggle()
+            elseif key == 'd' then
+              awful.keygrabber.stop(exit_screen_grabber)
+              exit_screen_grabber = nil
+              run_rofi()
+            else
+              return false
+            end
+          end
+        )
     end
   end
 
@@ -121,6 +140,10 @@ local LeftPanel = function(s, w, mw)
     panel.visible = true
     panel.width = w
     backdrop.visible = false
+    if exit_screen_grabber then
+      awful.keygrabber.stop(exit_screen_grabber)
+      exit_screen_grabber = nil
+    end
   end
 
   function panel:toggle(should_run_rofi)
@@ -256,9 +279,9 @@ local LeftPanel = function(s, w, mw)
       },
       nil,
       {
-        widget_battery,
-        wibox.container.margin(layoutbox, 4, 4, 4, 4),
         layout = wibox.layout.fixed.vertical,
+        wibox.container.margin(systray, dpi(7), dpi(7), dpi(7), dpi(7)),
+        widget_battery,
       },
     }
   }

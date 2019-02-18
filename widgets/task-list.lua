@@ -1,9 +1,10 @@
 local awful = require('awful')
-local common = require("awful.widget.common")
 local wibox = require('wibox')
 local capi = {button = _G.button}
 local dpi = require('beautiful').xresources.apply_dpi
 local gears = require('gears')
+
+local clickable_container = require('widgets.clickable-container')
 
 --- Common method to create buttons.
 -- @tab buttons
@@ -51,7 +52,7 @@ local function client_menu_toggle_fn()
 end
 local tasklist_buttons = gears.table.join(
   awful.button({ }, 1, function (c)
-      if c == client.focus then
+      if c == _G.client.focus then
         c.minimized = true
       else
         -- Without this, the following
@@ -62,7 +63,7 @@ local tasklist_buttons = gears.table.join(
         end
         -- This will also un-minimize
         -- the client, if needed
-        client.focus = c
+        _G.client.focus = c
         c:raise()
       end
   end),
@@ -80,7 +81,7 @@ local function list_update(w, buttons, label, data, objects)
   w:reset()
   for i, o in ipairs(objects) do
     local cache = data[o]
-    local ib, tb, bgb, tbm, ibm, l, ll
+    local ib, tb, bgb, tbm, ibm, l
     if cache then
       ib = cache.ib
       tb = cache.tb
@@ -91,9 +92,9 @@ local function list_update(w, buttons, label, data, objects)
       ib = wibox.widget.imagebox()
       tb = wibox.widget.textbox()
       bgb = wibox.container.background()
-      tbm = wibox.layout.flex.horizontal(wibox.container.margin(tb, dpi(4), dpi(4), dpi(4), dpi(4)))
+      tbm = wibox.layout.flex.horizontal(wibox.container.margin(tb, dpi(12), dpi(12), dpi(4), dpi(4)))
       tbm:set_max_widget_size(200)
-      ibm = wibox.container.margin(ib, dpi(12), dpi(12), dpi(12), dpi(12))
+      ibm = wibox.container.margin(ib, dpi(12), dpi(0), dpi(12), dpi(12))
       l = wibox.layout.fixed.horizontal()
 
       -- All of this is added in a fixed widget
@@ -140,7 +141,7 @@ local function list_update(w, buttons, label, data, objects)
     bgb.shape_border_width = args.shape_border_width
     bgb.shape_border_color = args.shape_border_color
 
-    w:add(bgb)
+    w:add(clickable_container(bgb))
   end
 end
 

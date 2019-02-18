@@ -1,9 +1,13 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
+local dpi = require('beautiful').xresources.apply_dpi
+local gears = require('gears')
 local wibox = require('wibox')
 
 local TaskList = require("widgets.task-list")
 local mytextclock = wibox.widget.textclock()
+
+local clickable_container = require('widgets.clickable-container')
 
 local TopPanel = function(s, h)
     -- Create a tasklist widget
@@ -12,6 +16,14 @@ local TopPanel = function(s, h)
     -- Create a promptbox for each screen
     local promptbox = awful.widget.prompt()
     s.mypromptbox = promptbox
+
+    local layoutbox = clickable_container(
+        wibox.container.margin(awful.widget.layoutbox(s), dpi(7), dpi(7), dpi(7), dpi(7)))
+    layoutbox:buttons(gears.table.join(
+                          awful.button({ }, 1, function () awful.layout.inc( 1) end),
+                          awful.button({ }, 3, function () awful.layout.inc(-1) end),
+                          awful.button({ }, 4, function () awful.layout.inc( 1) end),
+                          awful.button({ }, 5, function () awful.layout.inc(-1) end)))
 
     local panel = wibox {
         ontop = true,
@@ -33,8 +45,8 @@ local TopPanel = function(s, h)
         promptbox,
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-            wibox.widget.systray(),
             mytextclock,
+            layoutbox
         },
     }
     return panel
