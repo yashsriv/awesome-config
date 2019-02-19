@@ -1,6 +1,8 @@
+-- Global modules
 local awful = require('awful')
-local iconPath = os.getenv('HOME') .. '/.config/awesome/icons/'
-local gears = require('gears')
+
+-- Local Modules
+local icons = require('icons')
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
@@ -23,66 +25,49 @@ awful.layout.layouts = {
 }
 -- }}}
 
+local function build_tag(icon, screen, selected)
+  return {
+    icon = icon,
+    icon_only = true,
+    layout = awful.layout.layouts[1],
+    gap_single_client = false,
+    gap = 4,
+    screen = screen,
+    selected = selected or false
+  }
+end
+
 awful.screen.connect_for_each_screen(
-    function(s)
+  function(s)
+    awful.tag.add(
+      1,
+      build_tag(icons.firefox, s, true)
+    )
+    awful.tag.add(
+      2,
+      build_tag(icons.spacemacs, s, false)
+    )
+    awful.tag.add(
+      3,
+      build_tag(icons.terminal, s, false)
+    )
+    for i = 4, 10, 1 do
       awful.tag.add(
-        1,
-        {
-          icon = iconPath .. 'firefox.png',
-          icon_only = true,
-          layout = awful.layout.layouts[1],
-          gap_single_client = false,
-          gap = 4,
-          screen = s,
-          selected = true
-        }
+        i,
+        build_tag(icons.project(i), s, false)
       )
-      awful.tag.add(
-        2,
-        {
-          icon = iconPath .. 'spacemacs.svg',
-          icon_only = true,
-          layout = awful.layout.layouts[1],
-          gap_single_client = false,
-          gap = 4,
-          screen = s,
-        }
-      )
-      awful.tag.add(
-        3,
-        {
-          icon = iconPath .. 'terminal.svg',
-          icon_only = true,
-          layout = awful.layout.layouts[1],
-          gap_single_client = false,
-          gap = 4,
-          screen = s,
-        }
-      )
-      for i = 4, 10, 1 do
-        awful.tag.add(
-          i,
-          {
-            icon = iconPath .. 'project-' .. i .. '.svg',
-            icon_only = true,
-            layout = awful.layout.layouts[1],
-            gap_single_client = false,
-            gap = 4,
-            screen = s,
-          }
-        )
-      end
     end
+  end
 )
 
-tag.connect_signal(
-    'property::layout',
-    function(t)
-        local currentLayout = awful.tag.getproperty(t, 'layout')
-        if (currentLayout == awful.layout.suit.max) then
-            t.gap = 0
-        else
-            t.gap = 4
-        end
+_G.tag.connect_signal(
+  'property::layout',
+  function(t)
+    local currentLayout = awful.tag.getproperty(t, 'layout')
+    if (currentLayout == awful.layout.suit.max) then
+      t.gap = 0
+    else
+      t.gap = 4
     end
+  end
 )

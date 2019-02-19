@@ -1,10 +1,12 @@
-local wibox = require('wibox')
-local mat_slider = require('widgets.mat-slider')
-local watch = require('awful.widget.watch')
+-- Global modules
 local dpi = require('beautiful').xresources.apply_dpi
 local vicious = require("vicious")
-local filesystem = require('gears.filesystem')
-local iconPath = filesystem.get_configuration_dir() .. '/icons/'
+local watch = require('awful.widget.watch')
+local wibox = require('wibox')
+
+-- Local Modules
+local icons = require('icons')
+local mat_slider = require('widgets.mat-slider')
 
 local total_prev = 0
 local idle_prev = 0
@@ -64,7 +66,7 @@ local cpu_meter =
   wibox.widget {
     wibox.widget {
       wibox.widget {
-        image = iconPath .. 'chart.svg',
+        image = icons.cpu,
         widget = wibox.widget.imagebox
       },
       left = dpi(9),

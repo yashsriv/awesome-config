@@ -1,19 +1,17 @@
+-- Global modules
 local awful = require('awful')
 local beautiful = require('beautiful')
 local dpi = require('beautiful').xresources.apply_dpi
-local wibox = require('wibox')
 local gears = require('gears')
-local naughty = require('naughty')
 local filesystem = require('gears.filesystem')
-local iconPath = filesystem.get_configuration_dir() .. '/icons/'
+local wibox = require('wibox')
 
+-- Local modules
 local variables = require("conf.variables")
+local icons = require('icons')
 local clickable_container = require("widgets.clickable-container")
 local mat_list_item = require('widgets.mat-list-item')
-
 local widget_battery = require("widgets.battery")
-local systray = wibox.widget.systray()
-systray:set_horizontal(false)
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -33,19 +31,22 @@ local taglist_buttons = gears.table.join(
   awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
 )
 
-local arch_icon = wibox.widget {
-  image = iconPath .. 'arch.svg',
+local home_icon = wibox.widget {
+  image = icons.home,
   widget = wibox.widget.imagebox
 }
 
 local LeftPanel = function(s, w, mw)
+  local systray = wibox.widget.systray()
+  systray:set_horizontal(false)
+
   -- Create a taglist widget
   local taglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons, {}, nil,
                                        wibox.layout.fixed.vertical())
 
   local home_button = wibox.widget {
     wibox.widget {
-      wibox.container.margin(arch_icon, dpi(9), dpi(9), dpi(9), dpi(9)),
+      wibox.container.margin(home_icon, dpi(9), dpi(9), dpi(9), dpi(9)),
       widget = clickable_container
     },
     bg = beautiful.panel_bg,
@@ -90,8 +91,14 @@ local LeftPanel = function(s, w, mw)
     )
   )
 
+  local exit_screen_grabber = nil
+
   local run_rofi =
     function()
+      if exit_screen_grabber then
+        awful.keygrabber.stop(exit_screen_grabber)
+        exit_screen_grabber = nil
+      end
       _G.awesome.spawn(
         'rofi -show drun -theme ' .. filesystem.get_configuration_dir() .. '/conf/rofi.rasi',
         false,
@@ -103,8 +110,6 @@ local LeftPanel = function(s, w, mw)
         end
       )
     end
-
-  local exit_screen_grabber = nil
 
   local openPanel = function(should_run_rofi)
     panel.width = mw
@@ -176,7 +181,7 @@ local LeftPanel = function(s, w, mw)
     wibox.widget {
       wibox.widget {
         wibox.widget {
-          image = iconPath .. 'search.svg',
+          image = icons.search,
           widget = wibox.widget.imagebox
         },
         margins = dpi(12),
@@ -206,7 +211,7 @@ local LeftPanel = function(s, w, mw)
     wibox.widget {
       wibox.widget {
         wibox.widget {
-          image = iconPath .. 'logout.svg',
+          image = icons.logout,
           widget = wibox.widget.imagebox
         },
         margins = dpi(12),

@@ -1,67 +1,86 @@
+-- Global Modules
 local awful = require('awful')
+local beautiful = require('beautiful')
+local dpi = require('beautiful').xresources.apply_dpi
 local gears = require('gears')
 local wibox = require('wibox')
-local beautiful = require('beautiful')
-local naughty = require('naughty')
-local keygrabber = require('awful.keygrabber')
+
+-- Local Modules
 local clickable_container = require('widgets.clickable-container')
-local dpi = require('beautiful').xresources.apply_dpi
-local iconPath = os.getenv('HOME') .. '/.config/awesome/icons/'
+local icons = require('icons')
 
 -- Appearance
 local icon_size = beautiful.exit_screen_icon_size or dpi(140)
 
 local buildButton =
   function(icon, tooltipText)
-  local abutton =
-    wibox.widget {
-    wibox.widget {
+    local abutton =
       wibox.widget {
         wibox.widget {
-          image = iconPath .. icon,
-          widget = wibox.widget.imagebox
+          wibox.widget {
+            wibox.widget {
+              image = icon,
+              widget = wibox.widget.imagebox
+            },
+            top = dpi(16),
+            bottom = dpi(16),
+            left = dpi(16),
+            right = dpi(16),
+            widget = wibox.container.margin
+          },
+          shape = gears.shape.circle,
+          forced_width = icon_size,
+          forced_height = icon_size,
+          widget = clickable_container
         },
-        top = dpi(16),
-        bottom = dpi(16),
-        left = dpi(16),
-        right = dpi(16),
+        left = dpi(24),
+        right = dpi(24),
         widget = wibox.container.margin
-      },
-      shape = gears.shape.circle,
-      forced_width = icon_size,
-      forced_height = icon_size,
-      widget = clickable_container
-    },
-    left = dpi(24),
-    right = dpi(24),
-    widget = wibox.container.margin
-  }
+      }
 
-  return abutton
-end
+    awful.tooltip({
+        objects = {abutton},
+        mode = "outside",
+        preferred_positions = {"bottom", "top", "right", "left"},
+        preferred_alignments = {"middle", "front", "back"},
+        timer_function = function()
+          return tooltipText
+        end,
+        margin_leftright = dpi(8),
+        margin_topbottom = dpi(8)
+    })
 
-function suspend_command()
-  exit_screen_hide()
+    return abutton
+  end
+
+local exit_screen_grabber
+
+local function suspend_command()
+  _G.exit_screen_hide()
   awful.spawn.with_shell('systemctl suspend')
 end
-function exit_command()
-  awesome.quit()
+
+local function exit_command()
+  _G.awesome.quit()
 end
-function lock_command()
-  exit_screen_hide()
+
+local function lock_command()
+  _G.exit_screen_hide()
   awful.util.spawn("sync")
   awful.util.spawn("xautolock -locknow")
 end
-function poweroff_command()
+
+local function poweroff_command()
   awful.spawn.with_shell('systemctl poweroff')
   awful.keygrabber.stop(exit_screen_grabber)
 end
-function reboot_command()
+
+local function reboot_command()
   awful.spawn.with_shell('systemctl reboot')
   awful.keygrabber.stop(exit_screen_grabber)
 end
 
-local poweroff = buildButton('power.svg', 'Shutdown')
+local poweroff = buildButton(icons.power, 'Shutdown')
 poweroff:connect_signal(
   'button::release',
   function()
@@ -69,7 +88,7 @@ poweroff:connect_signal(
   end
 )
 
-local reboot = buildButton('restart.svg', 'Restart')
+local reboot = buildButton(icons.restart, 'Restart')
 reboot:connect_signal(
   'button::release',
   function()
@@ -77,7 +96,7 @@ reboot:connect_signal(
   end
 )
 
-local suspend = buildButton('sleep.svg', 'Sleep')
+local suspend = buildButton(icons.sleep, 'Sleep')
 suspend:connect_signal(
   'button::release',
   function()
@@ -85,7 +104,7 @@ suspend:connect_signal(
   end
 )
 
-local exit = buildButton('logout.svg', 'Logout')
+local exit = buildButton(icons.logout, 'Logout')
 exit:connect_signal(
   'button::release',
   function()
@@ -93,7 +112,7 @@ exit:connect_signal(
   end
 )
 
-local lock = buildButton('lock.svg', 'Lock')
+local lock = buildButton(icons.lock, 'Lock')
 lock:connect_signal(
   'button::release',
   function()
@@ -105,7 +124,7 @@ lock:connect_signal(
 local screen_geometry = awful.screen.focused().geometry
 
 -- Create the widget
-exit_screen =
+local exit_screen =
   wibox(
   {
     x = screen_geometry.x,
@@ -121,14 +140,12 @@ exit_screen =
 exit_screen.bg = '#192933dd'
 exit_screen.fg = beautiful.exit_screen_fg or beautiful.wibar_fg or '#FEFEFE'
 
-local exit_screen_grabber
-
-function exit_screen_hide()
+function _G.exit_screen_hide()
   awful.keygrabber.stop(exit_screen_grabber)
   exit_screen.visible = false
 end
 
-function exit_screen_show()
+function _G.exit_screen_show()
   -- naughty.notify({text = "starting the keygrabber"})
   exit_screen_grabber =
     awful.keygrabber.run(
@@ -149,7 +166,7 @@ function exit_screen_show()
         reboot_command()
       elseif key == 'Escape' or key == 'q' or key == 'x' then
         -- naughty.notify({text = "Cancel"})
-        exit_screen_hide()
+        _G.exit_screen_hide()
       -- else awful.keygrabber.stop(exit_screen_grabber)
       end
     end
@@ -164,7 +181,7 @@ exit_screen:buttons(
       {},
       2,
       function()
-        exit_screen_hide()
+        _G.exit_screen_hide()
       end
     ),
     -- Right click - Hide exit_screen
@@ -172,7 +189,7 @@ exit_screen:buttons(
       {},
       3,
       function()
-        exit_screen_hide()
+        _G.exit_screen_hide()
       end
     )
   )

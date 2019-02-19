@@ -17,7 +17,7 @@ require("module.panel")
 require('module.exit-screen')
 
 -- {{{ Mouse bindings
-root.buttons(gears.table.join(
+_G.root.buttons(gears.table.join(
     -- awful.button({ }, 3, function () mymainmenu:toggle() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
@@ -27,17 +27,17 @@ root.buttons(gears.table.join(
 require('conf.client')
 require('conf.tags')
 -- Set keys
-root.keys(require('conf.keys.global'))
+_G.root.keys(require('conf.keys.global'))
 -- }}}
 
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
-client.connect_signal("manage", function (c)
+_G.client.connect_signal("manage", function (c)
     -- Set the windows at the slave,
     -- i.e. put it at the end of others instead of setting it master.
-    if not awesome.startup then awful.client.setslave(c) end
+    if not _G.awesome.startup then awful.client.setslave(c) end
 
-    if awesome.startup and
+    if _G.awesome.startup and
       not c.size_hints.user_position
       and not c.size_hints.program_position then
         -- Prevent clients from being unreachable after screen count changes.
@@ -46,16 +46,16 @@ client.connect_signal("manage", function (c)
 end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
-client.connect_signal("request::titlebars", function(c)
+_G.client.connect_signal("request::titlebars", function(c)
     -- buttons for the titlebar
     local buttons = gears.table.join(
         awful.button({ }, 1, function()
-            client.focus = c
+            _G.client.focus = c
             c:raise()
             awful.mouse.client.move(c)
         end),
         awful.button({ }, 3, function()
-            client.focus = c
+            _G.client.focus = c
             c:raise()
             awful.mouse.client.resize(c)
         end)
@@ -88,15 +88,15 @@ client.connect_signal("request::titlebars", function(c)
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
-client.connect_signal("mouse::enter", function(c)
+_G.client.connect_signal("mouse::enter", function(c)
     if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
         and awful.client.focus.filter(c) then
-        client.focus = c
+        _G.client.focus = c
     end
 end)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+_G.client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
+_G.client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
 -- {{{ Startup

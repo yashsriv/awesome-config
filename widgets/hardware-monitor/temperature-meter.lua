@@ -1,10 +1,12 @@
-local wibox = require('wibox')
-local mat_slider = require('widgets.mat-slider')
-local watch = require('awful.widget.watch')
+-- Global modules
 local dpi = require('beautiful').xresources.apply_dpi
 local vicious = require("vicious")
-local filesystem = require('gears.filesystem')
-local iconPath = filesystem.get_configuration_dir() .. '/icons/'
+local watch = require('awful.widget.watch')
+local wibox = require('wibox')
+
+-- Local modules
+local icons = require('icons')
+local mat_slider = require('widgets.mat-slider')
 
 local slider =
   wibox.widget {
@@ -32,7 +34,7 @@ local temperature_meter =
   wibox.widget {
     wibox.widget {
       wibox.widget {
-        image = iconPath .. "thermometer.svg",
+        image = icons.temperature,
         widget = wibox.widget.imagebox
       },
       left = dpi(9),
